@@ -45,7 +45,7 @@ public class GearBox {
 		if (!gearLow) {
 			shift.SetA();
 		}
-		else (!neutral) {
+		else if (!neutral) {
 			neutralValve.SetA();
 			shift.SetA();
 		}
@@ -59,7 +59,7 @@ public class GearBox {
 		if (gearLow) {
 			shift.SetB();
 		}
-		else (neutral) { 
+		else if (neutral) { 
 			neutralValve.SetA();
 			shift.SetA();
 		}
@@ -73,7 +73,7 @@ public class GearBox {
 		if (!gearLow) {
 			neutralValve.SetB();
 		}
-		else (gearLow) {
+		else if (gearLow) {
 			shift.SetA();
 			neutralValve.SetB();
 		}
