@@ -50,7 +50,7 @@ public class PseudoShooter {
 	}
 
 	public void intake() {
-		if (!intaking) {
+		if (!intake) {
 			intake = true;
 			intakeMotor.set(Intake_Power);
 		} else {
@@ -59,7 +59,7 @@ public class PseudoShooter {
 	}
 
 	public void shoot() {
-		if (!shooting) {
+		if (!shoot) {
 			shoot = true;
 			shooterMotor1.set(Shooter_Power); 
 		} else {
