@@ -321,9 +321,11 @@ public class Robot extends SampleRobot
       // Configure slave CAN Talons to follow the front L & R Talons.
       LSlaveCanTalon.changeControlMode(TalonControlMode.Follower);
       LSlaveCanTalon.set(LFCanTalon.getDeviceID());
+      LSlaveCanTalon.reverseOutput(true);
 
       RSlaveCanTalon.changeControlMode(TalonControlMode.Follower);
       RSlaveCanTalon.set(RFCanTalon.getDeviceID());
+      RSlaveCanTalon.reverseOutput(true);
       
       // Turn on brake mode for CAN Talons.
       SetCANTalonBrakeMode(true);
