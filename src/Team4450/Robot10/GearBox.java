@@ -12,9 +12,9 @@ public class GearBox {
 	public boolean neutral = false;
 	public boolean PTO = false;
 	
-	public ValveDA shift = new ValveDA(0); //TODO: Get right #
-	public ValveDA neutralValve = new ValveDA(0); //TODO: Get right #
-	public ValveDA valve = new ValveDA(0); //TODO: Get right #  
+	public ValveDA shift = new ValveDA(0);
+	public ValveDA neutralValve = new ValveDA(4);
+	public ValveDA valve = new ValveDA(2); //PTO 
 	
 	
 	public GearBox (Robot robot)
@@ -44,10 +44,11 @@ public class GearBox {
 	public void gearLow() {
 		if (!gearLow) {
 			shift.SetA();
-		}
-		else if (!neutral) {
 			neutralValve.SetA();
+		}
+		else if (neutral) {
 			shift.SetA();
+			neutralValve.SetA();
 		}
 		neutral = false;
 		gearLow = true;
@@ -58,10 +59,12 @@ public class GearBox {
 	public void gearHigh() {
 		if (gearLow) {
 			shift.SetB();
+			neutralValve.SetB();
 		}
 		else if (neutral) { 
 			neutralValve.SetA();
-			shift.SetA();
+			shift.SetB();
+			neutralValve.SetB();
 		}
 		neutral = false;
 		gearLow = false;
@@ -71,11 +74,12 @@ public class GearBox {
 	
 	public void neutral() {
 		if (!gearLow) {
-			neutralValve.SetB();
+			shift.SetA();
 		}
 		else if (gearLow) {
-			shift.SetA();
+			shift.SetB();
 			neutralValve.SetB();
+			shift.SetA();
 		}
 		gearLow = true;
 		neutral = true;
@@ -99,5 +103,21 @@ public class GearBox {
 		gearLow();
 		dashDisplay();
 	}
+	
+	public boolean isPTO()
+	{
+		return PTO;
+	}
+	
+	public boolean isLowSpeed()
+	{
+		return gearLow;
+	}
+	
+	public boolean isNeutral()
+	{
+		return neutral;
+	}
+	
 
 }

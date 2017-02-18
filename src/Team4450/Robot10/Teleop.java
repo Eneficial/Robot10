@@ -15,16 +15,14 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Relay;
+//import edu.wpi.first.wpilibj.Relay;
 
 class Teleop
 {
 	private final Robot 		robot;
 	public  JoyStick			rightStick, leftStick, utilityStick;
 	public  LaunchPad			launchPad;
-	private final ValveDA		shifterValve = new ValveDA(2);
-	private final ValveDA		ptoValve = new ValveDA(0);
-	private boolean				ptoMode = false;
+	private	GearBox				gearBox;
 	private boolean				autoTarget = false;
 
 	// Wheel encoder is plugged into dio port 1 - orange=+5v blue=signal, dio port 2 black=gnd yellow=signal. 
@@ -39,6 +37,7 @@ class Teleop
 		Util.consoleLog();
 
 		this.robot = robot;
+		gearBox = new GearBox(robot);
 	}
 
 	// Free all objects that need it.
@@ -51,8 +50,7 @@ class Teleop
 		if (rightStick != null) rightStick.dispose();
 		if (utilityStick != null) utilityStick.dispose();
 		if (launchPad != null) launchPad.dispose();
-		if (shifterValve != null) shifterValve.dispose();
-		if (ptoValve != null) ptoValve.dispose();
+		if (gearBox != null) gearBox.dispose();
 		//if (encoder != null) encoder.free();
 	}
 
@@ -70,8 +68,8 @@ class Teleop
 		
 		// Initial setting of air valves.
 
-		shifterLow();
-		ptoDisable();
+		//shifterLow();
+		//ptoDisable();
 		
 		// Configure LaunchPad and Joystick event handlers.
 		
@@ -121,7 +119,7 @@ class Teleop
 			// Get joystick deflection and feed to robot drive object
 			// using calls to our JoyStick class.
 
-			if (ptoMode)
+			if (gearBox.isPTO())
 			{
 				rightY = utilityStick.GetY();
 
@@ -195,7 +193,7 @@ class Teleop
 	// Transmission control functions.
 	
 	//--------------------------------------
-	void shifterLow()
+/*	void shifterLow()
 	{
 		Util.consoleLog();
 		
@@ -222,7 +220,7 @@ class Teleop
 		
 		ptoMode = false;
 		
-		ptoValve.SetA();
+		//ptoValve.SetA();
 
 		SmartDashboard.putBoolean("PTO", false);
 	}
@@ -231,13 +229,13 @@ class Teleop
 	{
 		Util.consoleLog();
 		
-		ptoValve.SetB();
+		//ptoValve.SetB();
 
 		ptoMode = true;
 		
 		SmartDashboard.putBoolean("PTO", true);
 	}
-	
+	*/
 	// Handle LaunchPad control events.
 	
 	public class LaunchPadListener implements LaunchPadEventListener 
@@ -257,11 +255,10 @@ class Teleop
 				case BUTTON_BLUE:
     				if (launchPadEvent.control.latchedState)
     				{
-    					shifterLow();
-    					ptoEnable();
+    					gearBox.PTOon();
     				}
         			else
-        				ptoDisable();
+        				gearBox.PTOoff();
 
     				break;
     				
@@ -343,9 +340,9 @@ class Teleop
 			{
 				case TRIGGER:
 					if (button.latchedState)
-	    				shifterHigh();
+	    				gearBox.gearHigh();
 	    			else
-	    				shifterLow();
+	    				gearBox.gearLow();
 
 					break;
 					
