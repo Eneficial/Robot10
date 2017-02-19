@@ -121,7 +121,7 @@ class Teleop
 
 			if (gearBox.isPTO())
 			{
-				rightY = utilityStick.GetY();
+				rightY = 0;
 
 				leftY = rightY;
 			} 
