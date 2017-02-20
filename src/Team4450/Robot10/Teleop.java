@@ -123,7 +123,7 @@ class Teleop
 			{
 				rightY = 0;
 
-				leftY = utilityStick.GetY()
+				leftY = utilityStick.GetY();
 			} 
 			else
 			{

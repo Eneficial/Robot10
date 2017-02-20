@@ -84,6 +84,7 @@ public class GearBox {
 		gearLow = true;
 		neutral = true;
 		dashDisplay();
+		
 	}
 	
 	public void PTOon()
