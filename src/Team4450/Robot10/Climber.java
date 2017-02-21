@@ -16,10 +16,11 @@ public class Climber {
 	//private final CANTalon climbMotor2 = new CANTalon(0); //Get right number
 	
 	
-	public Climber(Robot robot, GearBox gearBox)
+	public Climber(Robot robot, Teleop teleop)
 	{
+		Util.consoleLog();
 		this.robot = robot;
-		this.gearBox = gearBox;
+		this.gearBox = teleop;
 	}
 	
 	public void dispose()
@@ -30,18 +31,21 @@ public class Climber {
 	
 	public void climbStart()
 	{
+		Util.consoleLog();
 		gearBox.PTOon();
 		climbPrepared = true;
 	}
 	
 	public void climbStop() 
 	{
+		Util.consoleLog();
 		climbPrepared = false;
 		gearBox.PTOoff();
 	}
 	
 	public void Climb(double power)
 	{
+		Util.consoleLog();
 		if (climbPrepared == true)
 		{
 			robot.LFCanTalon.set(0); //Get real power

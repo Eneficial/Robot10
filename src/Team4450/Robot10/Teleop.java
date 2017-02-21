@@ -24,6 +24,8 @@ class Teleop
 	public  LaunchPad			launchPad;
 	private	GearBox				gearBox;
 	private boolean				autoTarget = false;
+	private Gear PickupGear;
+	private Climber Climber;
 
 	// Wheel encoder is plugged into dio port 1 - orange=+5v blue=signal, dio port 2 black=gnd yellow=signal. 
 	//private Encoder				encoder = new Encoder(1, 2, true, EncodingType.k4X);
@@ -37,7 +39,9 @@ class Teleop
 		Util.consoleLog();
 
 		this.robot = robot;
-		gearBox = new GearBox(robot);
+		gearBox = new GearBox(robot, this);
+		PickupGear = new Gear(robot, this);
+		Climber = new Climber(robot, this);
 	}
 
 	// Free all objects that need it.
@@ -52,6 +56,7 @@ class Teleop
 		if (launchPad != null) launchPad.dispose();
 		if (gearBox != null) gearBox.dispose();
 		//if (encoder != null) encoder.free();
+		if (PickupGear != null) PickupGear.dispose();
 	}
 
 	void OperatorControl()
@@ -249,8 +254,11 @@ class Teleop
 			switch(control.id)
 			{
 				case BUTTON_YELLOW:
-					robot.cameraThread.ChangeCamera();
-    				break;
+					if (launchPadEvent.control.latchedState)
+						PickupGear.StartAutoPickup();
+					else
+						PickupGear.StopAutoPickup();
+					break;
     				
 				case BUTTON_BLUE:
     				if (launchPadEvent.control.latchedState)
@@ -263,10 +271,21 @@ class Teleop
     				break;
     				
 				case BUTTON_RED_RIGHT:
-					robot.navx.resetYaw();
-				
-				default:
+					if (launchPadEvent.control.latchedState)
+						PickupGear.lowerGear();
+					else
+						PickupGear.raiseGear();
+					
 					break;
+					
+				case BUTTON_RED:
+					if (launchPadEvent.control.latchedState)
+						PickupGear.gearOut();
+					else
+						PickupGear.gearIn();
+					
+					break;
+					
 			}
 	    }
 	    

@@ -30,7 +30,7 @@ import com.ctre.CANTalon.*;
 
 public class Robot extends SampleRobot 
 {
-  static final String  	PROGRAM_NAME = "HMW10-02.17.17-01";
+  static final String  	PROGRAM_NAME = "HMW10-02.20.17-01";
 
   // Motor CAN ID/PWM port assignments (1=left-front, 2=left-rear, 3=right-front, 4=right-rear)
   CANTalon				LFCanTalon, LRCanTalon, RFCanTalon, RRCanTalon, LSlaveCanTalon, RSlaveCanTalon;
@@ -195,6 +195,12 @@ public class Robot extends SampleRobot
 		  SmartDashboard.putBoolean("FMS", ds.isFMSAttached());
 		  SmartDashboard.putBoolean("AutoTarget", false);
 		  SmartDashboard.putBoolean("TargetLocked", false);
+		  SmartDashboard.putBoolean("gearLow", false);
+		  SmartDashboard.putBoolean("gearHigh", false);
+		  SmartDashboard.putBoolean("neutral", false);
+		  SmartDashboard.putBoolean("PickupGearMotor", false);
+		  SmartDashboard.putBoolean("PickupGearDown", false);
+		  
 		  
 		  Util.consoleLog("end");
 	  }

@@ -17,7 +17,7 @@ public class GearBox {
 	public ValveDA valve = new ValveDA(2); //PTO 
 	
 	
-	public GearBox (Robot robot)
+	public GearBox (Robot robot, Teleop teleop)
 	{
 		Util.consoleLog();
 		this.robot = robot;
