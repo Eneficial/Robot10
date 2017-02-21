@@ -21,6 +21,8 @@ public class Gear
 	private boolean pickupDown;
 	private boolean pickupOut;
 	
+	private Thread GearThread;
+	
 	public Gear(Robot robot, Teleop teleop)
 	{
 		Util.consoleLog();
@@ -98,7 +100,63 @@ public class Gear
 		SmartDashboard.putBoolean("PickupGearDown", true);
 	}
 	
-	//If gear is planned for auton, then put that into code accordingly. 
+	public void StartAutoPickup()
+	{
+		Util.consoleLog();
+		
+		if (GearThread != null) return;
+
+		GearThread = new AutoPickup();
+		GearThread.start();
+	}
 	
+
+	public void StopAutoPickup()
+	{
+		Util.consoleLog();
+
+		if (GearThread != null) GearThread.interrupt();
+		
+		GearThread = null;
+	}
+
 	
+	private class AutoPickup extends Thread
+	{
+		AutoPickup()
+		{
+			Util.consoleLog();
+			
+			this.setName("AutoGearPickup");
+	    }
+		
+	    public void run()
+	    {
+	    	Util.consoleLog();
+	    	
+	    	try
+	    	{
+	    		lowerGear();
+	    		sleep(250);
+	    		gearIn();
+	    		
+    	    	while (!isInterrupted() && motor.getOutputCurrent() < 1.0)
+    	    	{
+    	            // We sleep since JS updates come from DS every 20ms or so. We wait 50ms so this thread
+    	            // does not run at the same time as the teleop thread.
+    	    		LCD.printLine(7, "gearmotor current=%f", motor.getOutputCurrent());
+    	            sleep(50);
+    	    	}
+	    	}
+	    	catch (InterruptedException e) {}
+	    	catch (Throwable e) {e.printStackTrace(Util.logPrintStream);}
+
+	    	MotorStop();
+			raiseGear();
+			
+			GearThread = null;
+	    }
+	}	
 }
+	
+	

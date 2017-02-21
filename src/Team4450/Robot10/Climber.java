@@ -16,11 +16,11 @@ public class Climber {
 	//private final CANTalon climbMotor2 = new CANTalon(0); //Get right number
 	
 	
-	public Climber(Robot robot, Teleop teleop)
+	public Climber(Robot robot, GearBox gearBox)
 	{
 		Util.consoleLog();
 		this.robot = robot;
-		this.gearBox = teleop;
+		this.gearBox = gearBox;
 	}
 	
 	public void dispose()

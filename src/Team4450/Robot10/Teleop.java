@@ -41,7 +41,7 @@ class Teleop
 		this.robot = robot;
 		gearBox = new GearBox(robot, this);
 		PickupGear = new Gear(robot, this);
-		Climber = new Climber(robot, this);
+		//Climber = new Climber(robot, this);
 	}
 
 	// Free all objects that need it.
