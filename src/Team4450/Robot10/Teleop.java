@@ -26,9 +26,11 @@ class Teleop
 	private boolean				autoTarget = false;
 	private Gear PickupGear;
 	private Climber Climber;
+	private Shooter Shooter;
+	private Gear Gear;
 
 	// Wheel encoder is plugged into dio port 1 - orange=+5v blue=signal, dio port 2 black=gnd yellow=signal. 
-	//private Encoder				encoder = new Encoder(1, 2, true, EncodingType.k4X);
+	private Encoder				encoder = new Encoder(1, 2, true, EncodingType.k4X);
 
 	// Encoder ribbon cable to dio ports: ribbon wire 2 = orange, 5 = yellow, 7 = blue, 10 = black
 
@@ -40,8 +42,10 @@ class Teleop
 
 		this.robot = robot;
 		gearBox = new GearBox(robot, this);
-		PickupGear = new Gear(robot, this);
-		//Climber = new Climber(robot, this);
+		Gear = new Gear(robot, this);
+		Climber = new Climber(robot, gearBox);
+		Shooter = new Shooter(robot);
+		
 	}
 
 	// Free all objects that need it.
@@ -55,7 +59,7 @@ class Teleop
 		if (utilityStick != null) utilityStick.dispose();
 		if (launchPad != null) launchPad.dispose();
 		if (gearBox != null) gearBox.dispose();
-		//if (encoder != null) encoder.free();
+		if (encoder != null) encoder.free();
 		if (PickupGear != null) PickupGear.dispose();
 	}
 
@@ -255,9 +259,9 @@ class Teleop
 			{
 				case BUTTON_YELLOW:
 					if (launchPadEvent.control.latchedState)
-						PickupGear.StartAutoPickup();
+						Gear.StartAutoPickup();
 					else
-						PickupGear.StopAutoPickup();
+						Gear.StopAutoPickup();
 					break;
     				
 				case BUTTON_BLUE:
@@ -272,17 +276,17 @@ class Teleop
     				
 				case BUTTON_RED_RIGHT:
 					if (launchPadEvent.control.latchedState)
-						PickupGear.lowerGear();
+						Gear.lowerGear();
 					else
-						PickupGear.raiseGear();
+						Gear.raiseGear();
 					
 					break;
 					
 				case BUTTON_RED:
 					if (launchPadEvent.control.latchedState)
-						PickupGear.gearOut();
+						Gear.gearOut();
 					else
-						PickupGear.gearIn();
+						Gear.gearIn();
 					
 					break;
 					
@@ -311,12 +315,19 @@ class Teleop
     				
     				break;
     				
+	    		case ROCKER_LEFT_FRONT:
+	    				robot.cameraThread.ChangeCamera();
+    				break;
 				default:
 					break;
 	    	}
 	    }
 	}
 
+	
+	
+	
+	
 	// Handle Right JoyStick Button events.
 	
 	private class RightStickListener implements JoyStickEventListener 
@@ -392,6 +403,9 @@ class Teleop
 				case TRIGGER:
     				break;
 				
+				case TOP_LEFT:
+					if (button.latchedState)
+    				
 				default:
 					break;
 			}

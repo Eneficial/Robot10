@@ -76,7 +76,6 @@ public class Gear
 	public void lowerGear()
 	{
 		Util.consoleLog();
-		pickupDown = true;
 		ElevatorValve.SetB();
 		SmartDashboard.putBoolean("PickupGearDown", true);
 		
@@ -86,7 +85,6 @@ public class Gear
 	public void gearIn()
 	{
 		Util.consoleLog();
-		pickupOut = false;
 		PlacingValve.SetA();
 		SmartDashboard.putBoolean("PickupGearDown", false);
 	}
@@ -95,7 +93,6 @@ public class Gear
 	public void gearOut()
 	{
 		Util.consoleLog();
-		pickupOut = true;
 		PlacingValve.SetB();
 		SmartDashboard.putBoolean("PickupGearDown", true);
 	}
@@ -103,9 +100,6 @@ public class Gear
 	public void StartAutoPickup()
 	{
 		Util.consoleLog();
-		
-		if (GearThread != null) return;
-
 		GearThread = new AutoPickup();
 		GearThread.start();
 	}
@@ -114,9 +108,6 @@ public class Gear
 	public void StopAutoPickup()
 	{
 		Util.consoleLog();
-
-		if (GearThread != null) GearThread.interrupt();
-		
 		GearThread = null;
 	}
 
@@ -142,8 +133,6 @@ public class Gear
 	    		
     	    	while (!isInterrupted() && motor.getOutputCurrent() < 1.0)
     	    	{
-    	            // We sleep since JS updates come from DS every 20ms or so. We wait 50ms so this thread
-    	            // does not run at the same time as the teleop thread.
     	    		LCD.printLine(7, "gearmotor current=%f", motor.getOutputCurrent());
     	            sleep(50);
     	    	}

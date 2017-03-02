@@ -1,6 +1,6 @@
 package Team4450.Robot10;
 
-//import com.ctre.CANTalon;
+import com.ctre.CANTalon;
 
 import Team4450.Lib.Util;
 
@@ -9,10 +9,8 @@ public class Climber {
 	private final Robot robot;
 	private final GearBox gearBox;
 	
-	private boolean climbPrepared = false;
-	
 	//TODO: Find out how many motors we'll be using for climb
-	//private final CANTalon climbMotor = new CANTalon(0); //Get right number
+	private final CANTalon climbMotor = new CANTalon(0); //Get right number
 	//private final CANTalon climbMotor2 = new CANTalon(0); //Get right number
 	
 	
@@ -26,33 +24,24 @@ public class Climber {
 	public void dispose()
 	{
 		Util.consoleLog();
-		//if (climbMotor != null) climbMotor.dispose();
+		if (climbMotor != null) climbMotor.delete();
 	}
 	
 	public void climbStart()
 	{
 		Util.consoleLog();
 		gearBox.PTOon();
-		climbPrepared = true;
+		robot.LFCanTalon.set(0);
+		robot.RFCanTalon.set(0);
+		robot.LRCanTalon.set(0); 
+		robot.RRCanTalon.set(0); 
+		climbMotor.set(50); //Find actual power that I want to set this to.
 	}
 	
 	public void climbStop() 
 	{
 		Util.consoleLog();
-		climbPrepared = false;
 		gearBox.PTOoff();
-	}
-	
-	public void Climb(double power)
-	{
-		Util.consoleLog();
-		if (climbPrepared == true)
-		{
-			robot.LFCanTalon.set(0); //Get real power
-			robot.RFCanTalon.set(0); //Get real power
-			robot.LRCanTalon.set(0); //Get real power
-			robot.RRCanTalon.set(0); //Get real power
-		}
 	}
 	
 
