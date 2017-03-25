@@ -23,11 +23,12 @@ class Teleop
 	public  JoyStick			rightStick, leftStick, utilityStick;
 	public  LaunchPad			launchPad;
 	private	GearBox				gearBox;
-	private boolean				autoTarget = false;
+	private boolean				autoTarget;
+	private boolean invertDrive;
 	private Gear PickupGear;
-	private Climber Climber;
 	private Shooter Shooter;
 	private Gear Gear;
+	private Vision visionTrack;
 
 	// Wheel encoder is plugged into dio port 1 - orange=+5v blue=signal, dio port 2 black=gnd yellow=signal. 
 	private Encoder				encoder = new Encoder(1, 2, true, EncodingType.k4X);
@@ -43,8 +44,8 @@ class Teleop
 		this.robot = robot;
 		gearBox = new GearBox(robot, this);
 		Gear = new Gear(robot, this);
-		Climber = new Climber(robot, gearBox);
-		Shooter = new Shooter(robot);
+		Shooter = Shooter.getInstance(robot);
+		visionTrack = Vision.getInstance(robot);
 		
 	}
 
@@ -113,7 +114,7 @@ class Teleop
         if (robot.isComp) robot.SetCANTalonBrakeMode(lpControl.latchedState);
         
         // Set gyro to heading 0.
-        robot.gyro.reset();
+        //robot.gyro.reset();
 
         //robot.navx.resetYaw();
         //robot.navx.dumpValuesToNetworkTables();
@@ -130,22 +131,26 @@ class Teleop
 
 			if (gearBox.isPTO())
 			{
-				rightY = 0;
-
-				leftY = utilityStick.GetY();
-			} 
-			else
-			{
 				rightY = stickLogCorrection(rightStick.GetY());	// fwd/back right
     			leftY = stickLogCorrection(leftStick.GetY());	// fwd/back left
+			}
+			else
+			{
+				rightY = stickLogCorrection(rightStick.GetY());
+    			leftY = stickLogCorrection(leftStick.GetY());
 			}
 			
 			utilX = utilityStick.GetX();
 			
-			LCD.printLine(4, "leftY=%.4f  rightY=%.4f utilX=%.4f", leftY, rightY, utilX);
-			LCD.printLine(5, "gyroAngle=%d, gyroRate=%d", (int) robot.gyro.getAngle(), (int) robot.gyro.getRate());
-			//LCD.printLine(6, "yaw=%.0f, total=%.0f, rate=%.3f", robot.navx.getYaw(), robot.navx.getTotalYaw(), robot.navx.getYawRate());
-			
+			//LCD.printLine(3, "distance=%.2f", robot.monitorDistanceThread.getRangeInches());
+			LCD.printLine(4, "leftY=%.4f  rightY=%.4f  utilX=%.4f", leftY, rightY, utilX);
+			//LCD.printLine(5, "encoder=%d,  shootenc=%d", encoder.get(), Shooter.tlEncoder.get());
+			//LCD.printLine(5, "gyroAngle=%d, gyroRate=%d", (int) robot.gyro.getAngle(), (int) robot.gyro.getRate());
+			//LCD.printLine(6, "yaw=%.0f, total=%.0f, rate=%.3f", robot.navx.getYaw(), robot.navx.getTotalYaw(), 
+					//robot.navx.getYawRate());
+			LCD.printLine(7, "shootenc=%d rpm=%.0f pwr=%.2f", Shooter.shooterSpeed.get(), 
+					Shooter.shooterSpeed.getRate() * 60, Shooter.motor.get());
+
 			// Set wheel motors.
 			// Do not feed JS input to robotDrive if we are controlling the motors in automatic functions.
 
@@ -198,53 +203,7 @@ class Teleop
 			
 		return joystickValue;
 	}
-	
-	// Transmission control functions.
-	
-	//--------------------------------------
-/*	void shifterLow()
-	{
-		Util.consoleLog();
-		
-		shifterValve.SetA();
 
-		SmartDashboard.putBoolean("Low", true);
-		SmartDashboard.putBoolean("High", false);
-	}
-
-	void shifterHigh()
-	{
-		Util.consoleLog();
-		
-		shifterValve.SetB();
-
-		SmartDashboard.putBoolean("Low", false);
-		SmartDashboard.putBoolean("High", true);
-	}
-	
-	//--------------------------------------
-	void ptoDisable()
-	{
-		Util.consoleLog();
-		
-		ptoMode = false;
-		
-		//ptoValve.SetA();
-
-		SmartDashboard.putBoolean("PTO", false);
-	}
-	
-	void ptoEnable()
-	{
-		Util.consoleLog();
-		
-		//ptoValve.SetB();
-
-		ptoMode = true;
-		
-		SmartDashboard.putBoolean("PTO", true);
-	}
-	*/
 	// Handle LaunchPad control events.
 	
 	public class LaunchPadListener implements LaunchPadEventListener 
@@ -290,6 +249,8 @@ class Teleop
 					
 					break;
 					
+					default:
+						break;
 			}
 	    }
 	    
@@ -316,7 +277,7 @@ class Teleop
     				break;
     				
 	    		case ROCKER_LEFT_FRONT:
-	    				robot.cameraThread.ChangeCamera();
+	    				if (robot.cameraThread != null) robot.cameraThread.ChangeCamera();
     				break;
 				default:
 					break;
@@ -332,6 +293,8 @@ class Teleop
 	
 	private class RightStickListener implements JoyStickEventListener 
 	{
+		int angle;
+		
 		
 	    public void ButtonDown(JoyStickEvent joyStickEvent) 
 	    {
@@ -341,10 +304,21 @@ class Teleop
 			
 			switch(button.id)
 			{
+			case TRIGGER:
+				if (robot.cameraThread != null) robot.cameraThread.ChangeCamera();
+
+				break;
+				
 				case TOP_LEFT:
    					robot.cameraThread.ChangeCamera();
     				break;
-				
+					
+				case TOP_BACK:
+					visionTrack.SeekOffsetPeg();
+					angle = visionTrack.getPegOffset();
+					Util.consoleLog("angle=%d", angle);
+					break;
+					
 				default:
 					break;
 			}
@@ -400,20 +374,67 @@ class Teleop
 			switch(button.id)
 			{
 				// Trigger starts shoot sequence.
-				case TRIGGER:
-    				break;
+			case TRIGGER:
+				if (button.latchedState)
+    				Shooter.Intake();
+    			else
+    				Shooter.stopIntake();
+
+				break;
 				
-				case TOP_LEFT:
-					if (button.latchedState)
-    				
-				default:
-					break;
-			}
+			case TOP_RIGHT:
+				if (button.latchedState)
+				{
+    				Shooter.ballIntake();
+    				if (!Shooter.isRunning()) Shooter.IntakeReverse();
+				}
+    			else
+    			{
+    				Shooter.ballIntakeStop();
+    				if (!Shooter.isRunning()) Shooter.stopIntake();
+    			}
+				
+				break;
+				
+			case TOP_LEFT:
+				if (button.latchedState)
+    				Shooter.Initalizing(Shooter.SHOOTER_HIGH_POWER);
+    			else
+    				Shooter.stopInit();
+
+				break;
+			
+			case TOP_MIDDLE:
+				if (button.latchedState)
+    				Gear.MotorIn();
+    			else
+    				Gear.MotorStop();
+
+				break;
+				
+			case TOP_BACK:
+				if (button.latchedState)
+    				Gear.MotorOut();
+    			else
+    				Gear.MotorStop();
+
+				break;
+				
+			default:
+				break;
+		}
+    }
+
+		@Override
+		public void ButtonUp(JoyStickEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
 	    }
 
 	    public void ButtonUp(JoyStickEvent joyStickEvent) 
 	    {
 	    	//Util.consoleLog("%s", joyStickEvent.button.id.name());
 	    }
-	}
 }
+

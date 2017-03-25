@@ -40,7 +40,7 @@ public class Autonomous
 		encoder.reset();
         
         // Set gyro to heading 0.
-        robot.gyro.reset();
+        //robot.gyro.reset();
 
         // Wait to start motors so gyro will be zero before first movement.
         Timer.delay(.50);
@@ -69,15 +69,15 @@ public class Autonomous
 		while (robot.isAutonomous() && Math.abs(encoder.get()) < encoderCounts) 
 		{
 			LCD.printLine(3, "encoder=%d", encoder.get());
-			LCD.printLine(5, "gyroAngle=%d, gyroRate=%d", (int) robot.gyro.getAngle(), (int) robot.gyro.getRate());
+			//LCD.printLine(5, "gyroAngle=%d, gyroRate=%d", (int) robot.gyro.getAngle(), (int) robot.gyro.getRate());
 			
 			// Angle is negative if robot veering left, positive if veering right.
 			
-			angle = (int) robot.gyro.getAngle();
+			//angle = (int) robot.gyro.getAngle();
 			
 			//Util.consoleLog("angle=%d", angle);
 			
-			robot.robotDrive.drive(power, -angle * gain);
+			//robot.robotDrive.drive(power, -angle * gain);
 			
 			Timer.delay(.020);
 		}

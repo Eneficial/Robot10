@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import Team4450.Lib.LCD;
 import Team4450.Lib.Util;
 import Team4450.Lib.ValveDA;
-import Team4450.Lib.JoyStick.JoyStickButtonIDs;
+import Team4450.Lib.LaunchPad.LaunchPadControlIDs;
 
 public class Gear 
 {
@@ -18,8 +18,8 @@ public class Gear
 	private ValveDA PlacingValve = new ValveDA(1, 0);
 	private ValveDA ElevatorValve = new ValveDA(6);
 
-	private boolean pickupDown;
-	private boolean pickupOut;
+	private boolean pickupDown = true;
+	private boolean pickupOut = true;
 	
 	private Thread GearThread;
 	
@@ -40,19 +40,20 @@ public class Gear
 		Util.consoleLog();
 		if (ElevatorValve != null) ElevatorValve.dispose();
 		if (PlacingValve != null) PlacingValve.dispose();
+		if (motor != null) motor.delete();
 	}
 	
 	public void MotorIn()
 	{
 		Util.consoleLog();
-		motor.set(10); //Find out what power the motor should be
+		motor.set(0.50); //Find out what power the motor should be
 		SmartDashboard.putBoolean("PickUpGearMotor", true);
 	}
 	
 	public void MotorOut()
 	{
 		Util.consoleLog();
-		motor.set(-10); //Find out what power the motor should be
+		motor.set(-0.50); //Find out what power the motor should be
 		SmartDashboard.putBoolean("PickupGearMotor", false);
 	}
 	

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import Team4450.Lib.*;
-import edu.wpi.first.wpilibj.AnalogGyro;
+//import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,7 +30,7 @@ import com.ctre.CANTalon.*;
 
 public class Robot extends SampleRobot 
 {
-  static final String  	PROGRAM_NAME = "HMW10-02.20.17-01";
+  static final String  	PROGRAM_NAME = "HMW03-25.20.17-01";
 
   // Motor CAN ID/PWM port assignments (1=left-front, 2=left-rear, 3=right-front, 4=right-rear)
   CANTalon				LFCanTalon, LRCanTalon, RFCanTalon, RRCanTalon, LSlaveCanTalon, RSlaveCanTalon;
@@ -44,7 +44,8 @@ public class Robot extends SampleRobot
   
   final Compressor		compressor = new Compressor(0);	// Compressor class represents the PCM. There are 2.
   final Compressor		compressor1 = new Compressor(1);
-  final AnalogGyro		gyro = new AnalogGyro(0);		// gyro must be plugged into analog port 0 or 1.
+  private ValveDA unusedValve = new ValveDA(1,3);
+  //final AnalogGyro		gyro = new AnalogGyro(0);		// gyro must be plugged into analog port 0 or 1.
   
   public Properties		robotProperties;
   
@@ -113,12 +114,22 @@ public class Robot extends SampleRobot
 
    		// Initialize PID data entry fields on the DS to thier default values.
    		
-   		SmartDashboard.putBoolean("PIDEnabled", false);
-   		SmartDashboard.putNumber("PValue", 0);
-   		SmartDashboard.putNumber("IValue", 0);
-   		SmartDashboard.putNumber("DValue", 0);
-   		SmartDashboard.putNumber("LowSetting", 0);
-   		SmartDashboard.putNumber("HighSetting", 0);
+   		//SmartDashboard.putBoolean("PIDEnabled", false);
+   		//SmartDashboard.putNumber("PValue", 0);
+   		//SmartDashboard.putNumber("IValue", 0);
+   		//SmartDashboard.putNumber("DValue", 0);
+   		//SmartDashboard.putNumber("LowSetting", 0);
+   		//SmartDashboard.putNumber("HighSetting", 0);
+   		
+   		Shooter shooter = Shooter.getInstance(this);
+   		
+   		SmartDashboard.putBoolean("PIDEnabled", true);
+   		SmartDashboard.putNumber("PValue", shooter.ValueP);
+   		SmartDashboard.putNumber("IValue", shooter.ValueI);
+   		SmartDashboard.putNumber("DValue", shooter.ValueD);
+   		SmartDashboard.putNumber("LowSetting", shooter.SHOOTER_LOW_RPM);
+   		SmartDashboard.putNumber("HighSetting", shooter.SHOOTER_HIGH_RPM);
+   	
    		
    		// Reset PDB & PCM sticky faults.
       
@@ -126,6 +137,8 @@ public class Robot extends SampleRobot
    		compressor.clearAllPCMStickyFaults();
    		compressor1.clearAllPCMStickyFaults();
 
+   		unusedValve.SetA();
+   		
    		// Configure motor controllers and RobotDrive.
    		
 		InitializeCANTalonDrive();
@@ -159,17 +172,19 @@ public class Robot extends SampleRobot
 
    		// Start camera server using our class for usb cameras.
       
-   		//cameraThread = CameraFeed.getInstance(); 
-   		//cameraThread.start();
+   		cameraThread = CameraFeed.getInstance(); 
+   		cameraThread.start();
    		
    		// Start thread to monitor distance sensor.
    		
-   		//monitorDistanceThread = MonitorDistanceMBX.getInstance(this);
-   		//monitorDistanceThread.start();
+   		monitorDistanceThread = MonitorDistanceMBX.getInstance(this);
+   		monitorDistanceThread.start();
    		
    		// Create NavX object here so it has time to calibrate before we
    		// use it. Takes 10 seconds.
    		//navx = NavX.getInstance();
+   		
+   		shooter.dispose();
    		
    		Util.consoleLog("end");
     }
