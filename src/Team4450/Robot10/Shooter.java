@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Spark;
 
 public class Shooter {
 
-	private final Robot 	robot;
+	private final Robot robot;
 	
 	public static Shooter getInstance(Robot robot) {
 		if (shooter == null) shooter = new Shooter(robot);
@@ -28,14 +28,14 @@ public class Shooter {
 
 	public Counter tlEncoder = new Counter(0);
 	
-	static final double Intake_Power = 0.30; //clone is -0.25
-	static final double Index_Power = -0.50; //clone is -0.80
-	static final double Motor_Power = 0.80;
+	public double Intake_Power = 0.30; //clone is -0.25
+	public double Index_Power = -0.50; //clone is -0.80
+	public double Motor_Power = 0.80;
 	
-	static final double SHOOTER_LOW_POWER = 0.50;
-	static final double SHOOTER_HIGH_POWER = 0.45;
-	static final double SHOOTER_LOW_RPM = 3100;
-	static final double SHOOTER_HIGH_RPM = 3100; //3000 for clone bot
+	public double SHOOTER_LOW_POWER = 0.50;
+	public double SHOOTER_HIGH_POWER = 0.45;
+	public double SHOOTER_LOW_RPM = 3100;
+	public double SHOOTER_HIGH_RPM = 3100; //3000 for clone bot
 	
 	public double ValueP = 0.0025;
 	public double ValueI = 0.0025;
